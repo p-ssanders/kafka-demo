@@ -10,12 +10,18 @@ public class Consumer {
 
   private static final Logger logger = LoggerFactory.getLogger(Consumer.class);
 
-  @KafkaListener(topics = "users", groupId = "group_id")
+  @KafkaListener(topics = "users", groupId = "users_group")
   public void consume(Message message) {
     logger.info(String.format("Consumed: %s", message));
+
     if (message.getText().startsWith("foo")) {
       throw new RuntimeException("no foo!");
     }
+  }
+
+  @KafkaListener(topics = "users.DLT", groupId = "users_group")
+  public void consumeDeadLetterTopic(Message in) {
+    logger.info(String.format("Received from DLT: %s", in.getText()));
   }
 
 }
