@@ -18,7 +18,8 @@ public class Producer {
   }
 
   public void sendMessage(Message message) {
-    logger.info(String.format("Produced: %s", message));
     this.kafkaTemplate.send(TOPIC, message);
+
+    logger.info(String.format("Produced: %s", message));
   }
 }

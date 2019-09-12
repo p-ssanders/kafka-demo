@@ -1,5 +1,6 @@
 package com.example.kafkademo.app;
 
+import java.time.LocalDateTime;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,6 +18,6 @@ public class KafkaController {
 
   @PostMapping("/publish")
   public void sendMessageToKafkaTopic(@RequestParam("message") String message) {
-    this.producer.sendMessage(new Message(message));
+    this.producer.sendMessage(new Message(message, LocalDateTime.now()));
   }
 }
