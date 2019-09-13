@@ -1,4 +1,4 @@
-# kafka-demo
+# spring-kafka-demo
 
 Spring Boot application that demonstrates simple publish/subscribe functionality with Spring Kafka.
 
