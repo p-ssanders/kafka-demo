@@ -22,6 +22,8 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
+import org.springframework.kafka.listener.SeekToCurrentErrorHandler;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer2;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
@@ -39,13 +41,14 @@ public class KafkaDemoApplication {
     @Bean
     public ConcurrentKafkaListenerContainerFactory<Object, Object> kafkaListenerContainerFactory(
         ConcurrentKafkaListenerContainerFactoryConfigurer configurer,
-        ConsumerFactory<Object, Object> consumerFactory,
-        KafkaTemplate<Object, Object> template) {
+        ConsumerFactory<Object, Object> consumerFactory
+      , KafkaTemplate<Object, Object> template
+    ) {
 
       ConcurrentKafkaListenerContainerFactory<Object, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
       configurer.configure(factory, consumerFactory);
 
-//      factory.setErrorHandler(new SeekToCurrentErrorHandler(new DeadLetterPublishingRecoverer(template), 3));
+      factory.setErrorHandler(new SeekToCurrentErrorHandler(new DeadLetterPublishingRecoverer(template), 2));
 
       return factory;
     }
@@ -97,7 +100,6 @@ public class KafkaDemoApplication {
     public ObjectMapper objectMapper() {
       ObjectMapper objectMapper = new ObjectMapper();
       objectMapper.registerModule(new JavaTimeModule());
-
       objectMapper.enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
       return objectMapper;
