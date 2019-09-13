@@ -7,16 +7,17 @@ import org.springframework.kafka.core.KafkaTemplate;
 public class Producer {
 
   private static final Logger logger = LoggerFactory.getLogger(Producer.class);
-  private static final String TOPIC = "users";
 
+  private final String topic;
   private final KafkaTemplate<String, Message> kafkaTemplate;
 
-  public Producer(KafkaTemplate<String, Message> kafkaTemplate) {
+  public Producer(String topic, KafkaTemplate<String, Message> kafkaTemplate) {
+    this.topic = topic;
     this.kafkaTemplate = kafkaTemplate;
   }
 
   public void sendMessage(Message message) {
-    this.kafkaTemplate.send(TOPIC, message);
+    this.kafkaTemplate.send(topic, message);
 
     logger.info(String.format("Produced: %s", message));
   }

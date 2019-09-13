@@ -13,6 +13,7 @@ import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.Serializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.kafka.ConcurrentKafkaListenerContainerFactoryConfigurer;
@@ -42,7 +43,7 @@ public class KafkaDemoApplication {
 
     @Bean
     public Producer producer(KafkaTemplate kafkaTemplate) {
-      return new Producer(kafkaTemplate);
+      return new Producer("users", kafkaTemplate);
     }
 
     @Bean
@@ -66,19 +67,23 @@ public class KafkaDemoApplication {
     }
 
     @Bean
-    public ProducerFactory<Object, Object> producerFactory(Serializer<Object> keySerializer,
+    public ProducerFactory<Object, Object> producerFactory(
+        @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers,
+        Serializer<Object> keySerializer,
         Serializer<Object> valueSerializer) {
       Map<String, Object> props = new HashMap<>();
-      props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+      props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
 
       return new DefaultKafkaProducerFactory<>(props, keySerializer, valueSerializer);
     }
 
     @Bean
-    public ConsumerFactory<Object, Object> consumerFactory(Deserializer<Object> keyDeserializer,
+    public ConsumerFactory<Object, Object> consumerFactory(
+        @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers,
+        Deserializer<Object> keyDeserializer,
         Deserializer<Object> valueDeserializer) {
       Map<String, Object> props = new HashMap<>();
-      props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+      props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
       props.put(ConsumerConfig.GROUP_ID_CONFIG, "users_group");
       props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
