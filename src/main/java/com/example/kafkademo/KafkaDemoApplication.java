@@ -1,5 +1,7 @@
 package com.example.kafkademo;
 
+import com.example.kafkademo.app.Consumer;
+import com.example.kafkademo.app.Producer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -39,16 +41,26 @@ public class KafkaDemoApplication {
   public static class KafkaDemoApplicationConfiguration {
 
     @Bean
+    public Producer producer(KafkaTemplate kafkaTemplate) {
+      return new Producer(kafkaTemplate);
+    }
+
+    @Bean
+    public Consumer consumer() {
+      return new Consumer();
+    }
+
+    @Bean
     public ConcurrentKafkaListenerContainerFactory<Object, Object> kafkaListenerContainerFactory(
         ConcurrentKafkaListenerContainerFactoryConfigurer configurer,
         ConsumerFactory<Object, Object> consumerFactory
-      , KafkaTemplate<Object, Object> template
+      , KafkaTemplate kafkaTemplate
     ) {
 
       ConcurrentKafkaListenerContainerFactory<Object, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
       configurer.configure(factory, consumerFactory);
 
-      factory.setErrorHandler(new SeekToCurrentErrorHandler(new DeadLetterPublishingRecoverer(template), 2));
+      factory.setErrorHandler(new SeekToCurrentErrorHandler(new DeadLetterPublishingRecoverer(kafkaTemplate), 2));
 
       return factory;
     }
